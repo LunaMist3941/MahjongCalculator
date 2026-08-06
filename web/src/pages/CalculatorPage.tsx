@@ -8,7 +8,7 @@ function CalculatorPage() {
     RuleMode.JANTAMA_4
   );
 
-  const [tiles, setTiles] = useState<string[]>([]);
+  const [tiles] = useState<string[]>([]);
 
   return (
     <main>

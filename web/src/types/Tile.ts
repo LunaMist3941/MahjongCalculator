@@ -1,11 +1,18 @@
+export const TileSuit = {
+  MAN: "萬子",
+  PIN: "筒子",
+  SOU: "索子",
+  HONOR: "字牌",
+} as const;
+
 export type TileSuit =
-  | "man"
-  | "pin"
-  | "sou"
-  | "honor";
+  typeof TileSuit[keyof typeof TileSuit];
+
 
 export interface Tile {
+  id: string;
   suit: TileSuit;
   value: number;
-  red?: boolean;
+  name: string;
+  isRed?: boolean;
 }
