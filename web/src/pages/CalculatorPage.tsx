@@ -149,7 +149,7 @@ function CalculatorPage({ localYaku, onOpenHelp, onOpenYaku }: CalculatorPagePro
       melds,
       localYaku: applicableLocalYaku
         .filter((yaku) => selectedLocalYakuIds.includes(yaku.id))
-        .map(({ han, id, name, yakuman }) => ({ han, id, name, yakuman })),
+        .map(({ exclusive, han, id, limit, name, yakuman }) => ({ exclusive, han, id, limit, name, yakuman })),
       winningTileId: winningTile?.id,
       context,
     }));

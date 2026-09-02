@@ -7,6 +7,8 @@ import {
   type CalculationResult,
   type MeldInput,
   type ManualYakuInput,
+  type ScoreLimit,
+  SCORE_LIMIT_LABELS,
   type ScoreResult,
   type Tile,
   type Wind,
@@ -16,6 +18,13 @@ import {
 const TILE_COUNT = 34;
 const HONOR_START = 27;
 const DRAGON_START = 31;
+const SCORE_LIMIT_BASE_POINTS: Record<ScoreLimit, number> = {
+  mangan: 2000,
+  haneman: 3000,
+  baiman: 4000,
+  sanbaiman: 6000,
+  "counted-yakuman": 8000,
+};
 
 interface Group {
   kind: "sequence" | "triplet" | "kan";
@@ -284,9 +293,24 @@ function addYakuman(yaku: YakuResult[], id: string, name: string, yakuman = 1): 
   yaku.push({ id, name, han: 0, yakuman });
 }
 
-function keepYakumanOnly(yaku: YakuResult[]): YakuResult[] {
+function isScoreLimit(value: unknown): value is ScoreLimit {
+  return value === "mangan" || value === "haneman" || value === "baiman" ||
+    value === "sanbaiman" || value === "counted-yakuman";
+}
+
+function keepHighestLimitOnly(yaku: YakuResult[]): YakuResult[] {
+  const exclusiveYakuman = yaku.find((item) => item.yakuman && item.exclusive);
+  if (exclusiveYakuman) {
+    return [exclusiveYakuman];
+  }
   const yakuman = yaku.filter((item) => item.yakuman);
-  return yakuman.length > 0 ? yakuman : yaku;
+  if (yakuman.length > 0) {
+    return yakuman;
+  }
+  const fixedLimits = yaku.filter((item): item is YakuResult & { limit: ScoreLimit } => item.limit !== undefined);
+  const highestLimit = fixedLimits.reduce<YakuResult & { limit: ScoreLimit } | undefined>((highest, item) =>
+    !highest || SCORE_LIMIT_BASE_POINTS[item.limit] > SCORE_LIMIT_BASE_POINTS[highest.limit] ? item : highest, undefined);
+  return highestLimit ? [highestLimit] : yaku;
 }
 
 function normalizeManualYaku(localYaku: ManualYakuInput[]): { yaku: YakuResult[]; errors: string[] } {
@@ -299,17 +323,29 @@ function normalizeManualYaku(localYaku: ManualYakuInput[]): { yaku: YakuResult[]
       errors.push("手動追加役にはIDと名前が必要です。");
       continue;
     }
+    if (item.exclusive !== undefined && typeof item.exclusive !== "boolean") {
+      errors.push(`手動役「${item.name}」の排他設定が不正です。`);
+      continue;
+    }
     if (ids.has(item.id)) {
       errors.push(`手動追加役「${item.name}」が重複しています。`);
       continue;
     }
     ids.add(item.id);
     if (item.yakuman !== undefined) {
-      if (!Number.isInteger(item.yakuman) || item.yakuman < 1 || item.yakuman > 4 || item.han !== 0) {
+      if (item.limit !== undefined || !Number.isInteger(item.yakuman) || item.yakuman < 1 || item.yakuman > 4 || item.han !== 0) {
         errors.push(`手動役満「${item.name}」の値が不正です。`);
         continue;
       }
-      yaku.push({ id: item.id, name: item.name.trim(), han: 0, yakuman: item.yakuman });
+      yaku.push({ id: item.id, name: item.name.trim(), han: 0, yakuman: item.yakuman, ...(item.exclusive ? { exclusive: true } : {}) });
+      continue;
+    }
+    if (item.limit !== undefined) {
+      if (!isScoreLimit(item.limit) || item.han !== 0) {
+        errors.push(`手動上限役「${item.name}」の値が不正です。`);
+        continue;
+      }
+      yaku.push({ id: item.id, name: item.name.trim(), han: 0, limit: item.limit });
       continue;
     }
     if (!Number.isInteger(item.han) || item.han < 1 || item.han > 13) {
@@ -431,7 +467,7 @@ function evaluateYaku(
     } else {
       addYakuman(yaku, "kokushi", "国士無双");
     }
-    return keepYakumanOnly(yaku);
+    return keepHighestLimitOnly(yaku);
   }
 
   if (candidate.shape === "chiitoitsu") {
@@ -577,7 +613,7 @@ function evaluateYaku(
     addYakuman(yakuman, "suukantsu", "四槓子");
   }
 
-  return keepYakumanOnly([...yaku, ...yakuman]);
+  return keepHighestLimitOnly([...yaku, ...yakuman]);
 }
 
 function roundUp(value: number, unit: number): number {
@@ -636,6 +672,7 @@ function calculateScore(
   fu: number | null,
   yakuman: number,
   context: CalculationContext,
+  fixedLimit?: ScoreLimit,
 ): ScoreResult {
   let basePoints: number;
   let limitName: string;
@@ -643,6 +680,9 @@ function calculateScore(
   if (yakuman > 0) {
     basePoints = 8000 * yakuman;
     limitName = yakuman === 1 ? "役満" : `${yakuman}倍役満`;
+  } else if (fixedLimit) {
+    basePoints = SCORE_LIMIT_BASE_POINTS[fixedLimit];
+    limitName = SCORE_LIMIT_LABELS[fixedLimit];
   } else {
     const safeFu = fu ?? 0;
     const rawBase = safeFu * 2 ** (han + 2);
@@ -700,18 +740,22 @@ function evaluateCandidate(
   winningIndex: number | null,
   localYaku: YakuResult[],
 ): EvaluatedCandidate {
-  const yaku = keepYakumanOnly([
+  const yaku = keepHighestLimitOnly([
     ...evaluateYaku(candidate, counts, context, winningIndex),
     ...localYaku,
   ]);
-  const bonusHan = yaku.some((item) => item.yakuman) ? 0 :
+  const hasYakuman = yaku.some((item) => item.yakuman);
+  const fixedLimit = yaku.find((item) => item.limit !== undefined)?.limit;
+  const bonusHan = hasYakuman || fixedLimit ? 0 :
     Math.max(0, context.dora) + Math.max(0, context.uraDora) + Math.max(0, context.akaDora) +
     (getRuleConfig(context.rule).supportsKitaNuki ? Math.max(0, context.kitaNuki) : 0);
   const yakuHan = yaku.reduce((sum, item) => sum + item.han, 0);
   const han = yakuHan + bonusHan;
   const yakuman = yaku.reduce((sum, item) => sum + (item.yakuman ?? 0), 0);
-  const fu = yakuman > 0 ? null : calculateFu(candidate, yaku, context, winningIndex);
-  const score = yakuman > 0 || han > 0 ? calculateScore(han, fu, yakuman, context) : null;
+  const fu = hasYakuman || fixedLimit ? null : calculateFu(candidate, yaku, context, winningIndex);
+  const score = hasYakuman || fixedLimit || han > 0
+    ? calculateScore(han, fu, yakuman, context, fixedLimit)
+    : null;
   return { candidate, yaku, han, fu, bonusHan, score };
 }
 
@@ -756,6 +800,21 @@ export function calculateHand(input: CalculationInput): CalculationResult {
     : [];
 
   if (candidates.length === 0) {
+    const fixedLimit = normalizedLocalYaku.yaku.find((item): item is YakuResult & { limit: ScoreLimit } => item.limit !== undefined);
+    const hasManualYakuman = normalizedLocalYaku.yaku.some((item) => item.yakuman);
+    if (fixedLimit && !hasManualYakuman) {
+      return {
+        valid: true,
+        errors: [],
+        shape: null,
+        yaku: [fixedLimit],
+        han: 0,
+        fu: null,
+        bonusHan: 0,
+        kitaNuki: input.context.kitaNuki,
+        score: calculateScore(0, null, 0, input.context, fixedLimit.limit),
+      };
+    }
     return {
       valid: false,
       errors: errors.length > 0 ? errors : ["手牌を4面子1雀頭、七対子、国士無双のいずれかに分解できません。"],

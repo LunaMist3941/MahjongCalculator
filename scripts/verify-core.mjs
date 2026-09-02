@@ -63,6 +63,57 @@ const manualLocalYakuman = calculate([
 assert.deepEqual(manualLocalYakuman.yaku.map((item) => item.name), ["ローカル役満"]);
 assert.equal(manualLocalYakuman.score?.limitName, "役満");
 
+const manualLocalDoubleYakuman = calculate([
+  "man-2", "man-3", "man-4", "man-3", "man-5",
+  "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
+], "man-4", { riichi: true }, [{ id: "local-double-yakuman", name: "ローカル2倍役満", han: 0, yakuman: 2 }]);
+assert.deepEqual(manualLocalDoubleYakuman.yaku.map((item) => item.name), ["ローカル2倍役満"]);
+assert.equal(manualLocalDoubleYakuman.score?.limitName, "2倍役満");
+
+const manualLocalMangan = calculate([
+  "man-2", "man-3", "man-4", "man-3", "man-5",
+  "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
+], "man-4", { riichi: true, dora: 3 }, [{ id: "local-mangan", name: "流し満貫", han: 0, limit: "mangan" }]);
+assert.deepEqual(manualLocalMangan.yaku.map((item) => item.name), ["流し満貫"]);
+assert.equal(manualLocalMangan.score?.limitName, "満貫");
+assert.equal(manualLocalMangan.bonusHan, 0);
+
+const manualLocalManganWithoutWinningShape = calculate([
+  "man-1", "man-2", "man-4", "man-7", "man-9", "pin-1", "pin-3",
+  "pin-5", "pin-7", "pin-9", "sou-1", "sou-3", "sou-5", "sou-7",
+], "sou-7", { dora: 5 }, [{ id: "local-nagashi-mangan", name: "流し満貫", han: 0, limit: "mangan" }]);
+assert.equal(manualLocalManganWithoutWinningShape.valid, true);
+assert.equal(manualLocalManganWithoutWinningShape.shape, null);
+assert.equal(manualLocalManganWithoutWinningShape.score?.limitName, "満貫");
+
+const manualDaiShichisei = calculate([
+  "east", "east", "south", "south", "west", "west", "north", "north",
+  "white", "white", "green", "green", "red", "red",
+], "red", { winMethod: "tsumo" }, [{
+  exclusive: true,
+  id: "dai-shichisei",
+  name: "大七星",
+  han: 0,
+  yakuman: 2,
+}]);
+assert.equal(manualDaiShichisei.valid, true);
+assert.deepEqual(manualDaiShichisei.yaku.map((item) => item.name), ["大七星"]);
+assert.equal(manualDaiShichisei.score?.limitName, "2倍役満");
+
+for (const [limit, limitName] of [
+  ["haneman", "跳満"],
+  ["baiman", "倍満"],
+  ["sanbaiman", "三倍満"],
+  ["counted-yakuman", "数え役満"],
+]) {
+  const manualLimit = calculate([
+    "man-2", "man-3", "man-4", "man-3", "man-5",
+    "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
+  ], "man-4", {}, [{ id: `local-${limit}`, name: `ローカル${limitName}`, han: 0, limit }]);
+  assert.equal(manualLimit.valid, true);
+  assert.equal(manualLimit.score?.limitName, limitName);
+}
+
 const pinfuTsumoSanma = calculate([
   "pin-2", "pin-3", "pin-4", "pin-3", "pin-5",
   "sou-2", "sou-3", "sou-4", "sou-6", "sou-7", "sou-8", "sou-5", "sou-5", "pin-4",

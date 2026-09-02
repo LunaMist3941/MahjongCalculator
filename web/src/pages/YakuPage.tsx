@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isYakuAvailable, YAKU_CATALOG, type LocalYakuDefinition, type YakuDefinition } from "@core/yaku";
 import { RuleMode } from "@core/rules";
 import { getTileById } from "@core/tiles";
-import type { Tile } from "@core/types";
+import { SCORE_LIMIT_LABELS, type ScoreLimit, type Tile } from "@core/types";
 import RuleSelector from "../components/RuleSelector";
 
 interface YakuPageProps {
@@ -12,8 +12,23 @@ interface YakuPageProps {
   onRemoveLocalYaku: (id: string) => void;
 }
 
-const categories = ["すべて", ...new Set(YAKU_CATALOG.map((yaku) => yaku.category))];
-type LocalCategory = "通常役" | "役満";
+const categories = ["すべて", ...new Set([
+  ...YAKU_CATALOG.map((yaku) => yaku.category),
+  "満貫" as const,
+  "跳満" as const,
+  "倍満" as const,
+  "三倍満" as const,
+  "数え役満" as const,
+  "2倍役満" as const,
+])];
+type LocalCategory = LocalYakuDefinition["category"];
+const localLimitByCategory: Partial<Record<LocalCategory, ScoreLimit>> = {
+  "満貫": "mangan",
+  "跳満": "haneman",
+  "倍満": "baiman",
+  "三倍満": "sanbaiman",
+  "数え役満": "counted-yakuman",
+};
 
 function valueLabel(yaku: YakuDefinition): string {
   if (yaku.yakuman) {
@@ -34,8 +49,20 @@ function exampleTiles(yaku: YakuDefinition): Tile[] {
     .filter((tile): tile is Tile => Boolean(tile));
 }
 
+function localExampleTiles(yaku: LocalYakuDefinition): Tile[] {
+  return (yaku.exampleTiles ?? [])
+    .map((id) => getTileById(id))
+    .filter((tile): tile is Tile => Boolean(tile));
+}
+
 function localValueLabel(yaku: LocalYakuDefinition): string {
-  return yaku.yakuman ? `${yaku.yakuman}役満（手動）` : `${yaku.han}翻（手動）`;
+  if (yaku.limit) {
+    return `${SCORE_LIMIT_LABELS[yaku.limit]}（手動）`;
+  }
+  if (yaku.yakuman) {
+    return yaku.yakuman === 1 ? "役満（手動）" : `${yaku.yakuman}倍役満（手動）`;
+  }
+  return `${yaku.han}翻（手動）`;
 }
 
 function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: YakuPageProps) {
@@ -71,17 +98,20 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
       setLocalFormError("通常役の翻数は1〜13翻で指定してください。");
       return;
     }
+    const localLimit = localLimitByCategory[localCategory];
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `local-${Date.now()}`;
     onAddLocalYaku({
       category: localCategory,
       condition: condition || "この役を採用する場合の成立条件を手動で確認します。",
-      han: localCategory === "役満" ? 0 : localHan,
+      han: localCategory === "通常役" ? localHan : 0,
       id: `local-${id}`,
+      ...(localLimit ? { limit: localLimit } : {}),
       name,
       rules: [rule],
       ...(localCategory === "役満" ? { yakuman: 1 } : {}),
+      ...(localCategory === "2倍役満" ? { yakuman: 2 } : {}),
     });
     setLocalName("");
     setLocalCondition("");
@@ -126,7 +156,7 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
 
         <div className="yaku-catalog-grid">
           {visibleYaku.map((yaku) => (
-            <article className={`yaku-catalog-card ${yaku.category === "役満" ? "is-yakuman" : ""}`} key={yaku.id}>
+            <article className={`yaku-catalog-card ${yaku.yakuman ? "is-yakuman" : ""}`} key={yaku.id}>
               <div className="yaku-card-heading">
                 <h3>{yaku.name}</h3>
                 <span>{yaku.category}</span>
@@ -146,14 +176,22 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
             </article>
           ))}
           {visibleLocalYaku.map((yaku) => (
-            <article className={`yaku-catalog-card is-local ${yaku.category === "役満" ? "is-yakuman" : ""}`} key={yaku.id}>
+            <article className={`yaku-catalog-card is-local ${yaku.yakuman ? "is-yakuman" : ""} ${yaku.limit ? "is-limit" : ""}`} key={yaku.id}>
               <div className="yaku-card-heading">
                 <h3>{yaku.name}</h3>
-                <span>ローカル役</span>
+                <span>{yaku.source === "initial" ? "初期役" : yaku.source === "standard-local" ? "標準ローカル" : yaku.builtIn ? "標準ローカル" : "ローカル役"}</span>
               </div>
               <p className="yaku-value">{localValueLabel(yaku)}</p>
               <p className="yaku-condition"><strong>成立条件：</strong>{yaku.condition}</p>
-              <button className="local-yaku-remove" onClick={() => onRemoveLocalYaku(yaku.id)} type="button">この役を削除</button>
+              {localExampleTiles(yaku).length > 0 && (
+                <div className="yaku-example" aria-label={`${yaku.name}の代表牌姿`}>
+                  <span>代表牌姿</span>
+                  <div className="yaku-example-tiles">
+                    {localExampleTiles(yaku).map((tile, index) => <img alt={tile.name} key={`${tile.id}-${index}`} src={tile.image} />)}
+                  </div>
+                </div>
+              )}
+              {!yaku.builtIn && <button className="local-yaku-remove" onClick={() => onRemoveLocalYaku(yaku.id)} type="button">この役を削除</button>}
             </article>
           ))}
         </div>
@@ -177,7 +215,13 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
             <span>分類</span>
             <select onChange={(event) => setLocalCategory(event.target.value as LocalCategory)} value={localCategory}>
               <option value="通常役">通常役</option>
+              <option value="満貫">満貫</option>
+              <option value="跳満">跳満</option>
+              <option value="倍満">倍満</option>
+              <option value="三倍満">三倍満</option>
+              <option value="数え役満">数え役満</option>
               <option value="役満">役満</option>
+              <option value="2倍役満">2倍役満</option>
             </select>
           </label>
           {localCategory === "通常役" && (

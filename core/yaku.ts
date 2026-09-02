@@ -1,4 +1,8 @@
 import { RuleMode } from "./rules.ts";
+import type { ScoreLimit } from "./types.ts";
+
+export type LocalYakuCategory = "通常役" | "満貫" | "跳満" | "倍満" | "三倍満" | "数え役満" | "役満" | "2倍役満";
+export type LocalYakuSource = "initial" | "standard-local";
 
 export interface YakuDefinition {
   aliases?: string[];
@@ -14,15 +18,46 @@ export interface YakuDefinition {
 }
 
 export interface LocalYakuDefinition {
-  category: "通常役" | "役満";
+  builtIn?: boolean;
+  category: LocalYakuCategory;
   condition: string;
   exampleTiles?: readonly string[];
+  exclusive?: boolean;
   han: number;
   id: string;
+  limit?: ScoreLimit;
   name: string;
   rules: readonly RuleMode[];
+  source?: LocalYakuSource;
   yakuman?: number;
 }
+
+export const DEFAULT_LOCAL_YAKU: readonly LocalYakuDefinition[] = [
+  {
+    builtIn: true,
+    category: "満貫",
+    condition: "捨て牌がすべて么九牌（1・9・字牌）で、捨て牌が鳴かれず、他家の和了がないまま流局するなど、採用ルールの条件を満たす。",
+    han: 0,
+    id: "nagashi-mangan",
+    limit: "mangan",
+    name: "流し満貫",
+    rules: [RuleMode.JANTAMA_4, RuleMode.JANTAMA_3, RuleMode.STANDARD_4, RuleMode.STANDARD_3],
+    source: "initial",
+  },
+  {
+    builtIn: true,
+    category: "2倍役満",
+    condition: "東・南・西・北・白・發・中の7種類をすべて2枚ずつ使った七対子。採用ルールによって役満数が異なる場合があります。",
+    exampleTiles: ["east", "east", "south", "south", "west", "west", "north", "north", "white", "white", "green", "green", "red", "red"],
+    exclusive: true,
+    han: 0,
+    id: "dai-shichisei",
+    name: "大七星",
+    rules: [RuleMode.JANTAMA_4, RuleMode.JANTAMA_3, RuleMode.STANDARD_4, RuleMode.STANDARD_3],
+    source: "standard-local",
+    yakuman: 2,
+  },
+];
 
 const YAKU_CATALOG_BASE: readonly YakuDefinition[] = [
   { id: "riichi", name: "立直", category: "通常役", closedHan: 1 },

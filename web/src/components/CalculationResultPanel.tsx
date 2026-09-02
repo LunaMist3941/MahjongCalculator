@@ -1,4 +1,4 @@
-import type { CalculationResult } from "@core/types";
+import { SCORE_LIMIT_LABELS, type CalculationResult } from "@core/types";
 
 interface CalculationResultPanelProps {
   onClose: () => void;
@@ -60,7 +60,7 @@ function CalculationResultPanel({ onClose, result }: CalculationResultPanelProps
       </div>
 
       <div className="score-summary">
-        <div><span>翻</span><strong>{result.han}</strong></div>
+        <div><span>翻</span><strong>{result.yaku.some((item) => item.limit !== undefined) ? "—" : result.han}</strong></div>
         <div><span>符</span><strong>{result.fu ?? "—"}</strong></div>
         <div><span>加算</span><strong>{result.bonusHan}</strong></div>
       </div>
@@ -70,7 +70,7 @@ function CalculationResultPanel({ onClose, result }: CalculationResultPanelProps
         {result.yaku.map((item) => (
           <li key={item.id}>
             <span>{item.name}</span>
-            <b>{item.yakuman ? `${item.yakuman}役満` : `${item.han}翻`}</b>
+            <b>{item.limit ? `${SCORE_LIMIT_LABELS[item.limit]}` : item.yakuman ? `${item.yakuman}役満` : `${item.han}翻`}</b>
           </li>
         ))}
         {result.bonusHan - result.kitaNuki > 0 && (

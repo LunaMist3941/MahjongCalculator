@@ -71,17 +71,31 @@ export interface CalculationInput {
   context: CalculationContext;
 }
 
+export type ScoreLimit = "mangan" | "haneman" | "baiman" | "sanbaiman" | "counted-yakuman";
+
+export const SCORE_LIMIT_LABELS: Record<ScoreLimit, string> = {
+  mangan: "満貫",
+  haneman: "跳満",
+  baiman: "倍満",
+  sanbaiman: "三倍満",
+  "counted-yakuman": "数え役満",
+};
+
 export interface ManualYakuInput {
+  exclusive?: boolean;
   han: number;
   id: string;
+  limit?: ScoreLimit;
   name: string;
   yakuman?: number;
 }
 
 export interface YakuResult {
+  exclusive?: boolean;
   id: string;
   name: string;
   han: number;
+  limit?: ScoreLimit;
   yakuman?: number;
 }
 

@@ -137,12 +137,15 @@ h3 { margin-bottom: 10px; font-size: 0.9rem; color: #597061; }
 .yaku-catalog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .yaku-catalog-card { min-width: 0; padding: 13px; border: 1px solid #dce8de; border-radius: 12px; background: #f8fbf8; }
 .yaku-catalog-card.is-yakuman { border-color: #d9c28d; background: #fffaf0; }
+.yaku-catalog-card.is-limit { border-color: #d9c28d; background: #fffaf0; }
 .yaku-catalog-card.is-local { border-style: dashed; border-color: #9ebca5; background: #f4faf5; }
+.yaku-catalog-card.is-local.is-limit { border-color: #d9c28d; background: #fffaf0; }
 .yaku-card-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .yaku-card-heading h3 { margin-bottom: 2px; color: #285b3b; font-size: 1rem; }
 .yaku-card-heading span { color: #6e8575; font-size: 0.66rem; white-space: nowrap; }
 .yaku-value { margin: 5px 0 0; color: #34774c; font-size: 0.86rem; font-weight: 800; }
 .yaku-catalog-card.is-yakuman .yaku-value { color: #986a27; }
+.yaku-catalog-card.is-limit .yaku-value { color: #986a27; }
 .yaku-condition { margin: 8px 0 0; color: #5f7065; font-size: 0.75rem; line-height: 1.5; }
 .yaku-condition strong { color: #496554; }
 .yaku-example { display: grid; gap: 4px; padding-top: 8px; margin-top: 8px; border-top: 1px solid #e2ebe3; color: #789080; font-size: 0.66rem; font-weight: 800; }
