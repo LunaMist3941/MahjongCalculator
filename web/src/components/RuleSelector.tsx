@@ -1,34 +1,27 @@
-import { RuleMode } from "../types/Rule";
+import { RULE_OPTIONS } from "@core/rules";
+import type { RuleMode } from "@core/rules";
 
 interface RuleSelectorProps {
   value: RuleMode;
   onChange: (mode: RuleMode) => void;
 }
 
-function RuleSelector({
-  value,
-  onChange,
-}: RuleSelectorProps) {
-  const modes = Object.values(RuleMode);
-
+function RuleSelector({ value, onChange }: RuleSelectorProps) {
   return (
-    <section>
-      <label>
-        ルール:
-        <select
-          value={value}
-          onChange={(event) =>
-            onChange(event.target.value as RuleMode)
-          }
-        >
-          {modes.map((mode) => (
-            <option key={mode} value={mode}>
-              {mode}
-            </option>
-          ))}
-        </select>
-      </label>
-    </section>
+    <label className="field">
+      <span>ルール</span>
+      <select
+        aria-label="ルール"
+        onChange={(event) => onChange(event.target.value as RuleMode)}
+        value={value}
+      >
+        {RULE_OPTIONS.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

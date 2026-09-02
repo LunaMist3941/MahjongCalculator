@@ -1,0 +1,55 @@
+export interface MahjongTerm {
+  category: "基本" | "牌姿・待ち" | "役" | "点数" | "局面";
+  description: string;
+  name: string;
+  reading: string;
+  aliases?: string[];
+}
+
+export const mahjongTerms: MahjongTerm[] = [
+  { category: "基本", name: "和了", reading: "あがり", aliases: ["アガリ", "あがる"], description: "役があり、決められた形を完成させて勝つこと。" },
+  { category: "基本", name: "手牌", reading: "てはい", description: "自分が持っている牌。通常は13枚で、ツモ後に14枚になります。" },
+  { category: "基本", name: "面子", reading: "メンツ", aliases: ["メンツ"], description: "チー（順子）・ポン（刻子）・カン（槓子）など、手牌を構成する組み合わせ。" },
+  { category: "基本", name: "チー", reading: "チー", aliases: ["順子", "シュンツ"], description: "他家の捨て牌を1枚もらい、同じ種類で連続した3枚の順子（シュンツ）を作る操作。" },
+  { category: "基本", name: "ポン", reading: "ポン", aliases: ["刻子", "コーツ"], description: "他家の捨て牌を1枚もらい、同じ牌3枚の刻子（コーツ）を作る操作。" },
+  { category: "基本", name: "カン", reading: "カン", aliases: ["槓子", "カンツ"], description: "同じ牌4枚の槓子（カンツ）を公開または暗槓として扱う操作。成立後は嶺上牌を補充します。" },
+  { category: "基本", name: "雀頭", reading: "ジャントウ", aliases: ["頭", "アタマ"], description: "同じ牌2枚の組み合わせ。一般的な和了形では1組必要です。" },
+  { category: "基本", name: "門前", reading: "メンゼン", aliases: ["メンゼン手"], description: "他家から牌をもらって面子を公開していない状態。暗槓は門前扱いです。" },
+  { category: "基本", name: "副露", reading: "フーロ", aliases: ["鳴き", "鳴く"], description: "チー・ポン・明槓などで他家の牌を使い、面子を公開すること。" },
+  { category: "牌姿・待ち", name: "両面待ち", reading: "リャンメンまち", aliases: ["リャンメン"], description: "順子の両端のどちらでも完成する待ち。平和の成立条件の一つです。" },
+  { category: "牌姿・待ち", name: "嵌張待ち", reading: "カンチャンまち", aliases: ["カンチャン"], description: "順子の中央の1種類を待つ形。例：二・四から三待ち。" },
+  { category: "牌姿・待ち", name: "辺張待ち", reading: "ペンチャンまち", aliases: ["ペンチャン"], description: "一・二から三、または八・九から七を待つ形。" },
+  { category: "牌姿・待ち", name: "単騎待ち", reading: "タンキまち", aliases: ["タンキ"], description: "雀頭になる1種類を待つ形。四暗刻単騎などの判定に関係します。" },
+  { category: "牌姿・待ち", name: "双碰待ち", reading: "シャンポンまち", aliases: ["シャンポン"], description: "2種類の対子のどちらかが刻子になる待ち。" },
+  { category: "牌姿・待ち", name: "和了牌", reading: "あがりはい", aliases: ["アガリ牌", "ツモ牌"], description: "最後に加わって和了形を完成させた牌。このアプリでは入力手牌の最後の牌を使います。" },
+  { category: "役", name: "立直", reading: "リーチ", aliases: ["リーチ"], description: "門前でテンパイを宣言する1翻役。" },
+  { category: "役", name: "断么九", reading: "タンヤオチュー", aliases: ["タンヤオ"], description: "一・九・字牌を使わず、二から八の数牌だけで構成する1翻役。" },
+  { category: "役", name: "平和", reading: "ピンフ", aliases: ["ピンフ"], description: "門前で4つの順子、役牌でない雀頭、両面待ちを満たす1翻役。" },
+  { category: "役", name: "一盃口", reading: "イーペーコー", aliases: ["イーペー"], description: "門前で同じ順子を2組そろえる1翻役。" },
+  { category: "役", name: "七対子", reading: "チートイツ", aliases: ["チートイ"], description: "7組の対子で構成する特殊形の2翻役。" },
+  { category: "役", name: "混一色", reading: "ホンイツ", aliases: ["ホンイツ"], description: "1種類の数牌と字牌だけで構成する役。門前3翻、鳴き2翻です。" },
+  { category: "役", name: "清一色", reading: "チンイツ", aliases: ["チンイツ"], description: "1種類の数牌だけで構成する役。門前6翻、鳴き5翻です。" },
+  { category: "役", name: "対々和", reading: "トイトイホー", aliases: ["トイトイ"], description: "4つの面子をすべて刻子または槓子にする2翻役。" },
+  { category: "役", name: "三色同順", reading: "サンショクドウジュン", aliases: ["三色"], description: "萬子・筒子・索子で同じ数字の順子を1組ずつそろえる役。" },
+  { category: "役", name: "一気通貫", reading: "イッキツウカン", aliases: ["一通", "イッツー"], description: "同じ種類で一・二・三、四・五・六、七・八・九をそろえる役。" },
+  { category: "役", name: "役牌", reading: "ヤクハイ", aliases: ["翻牌"], description: "白・發・中、または自風・場風の刻子／槓子による1翻役。" },
+  { category: "役", name: "海底摸月", reading: "ハイテイモーユエ", aliases: ["海底"], description: "最後の牌をツモって和了する1翻役。" },
+  { category: "役", name: "河底撈魚", reading: "ホウテイラオユイ", aliases: ["河底"], description: "最後の捨て牌でロンする1翻役。" },
+  { category: "役", name: "嶺上開花", reading: "リンシャンカイホウ", aliases: ["嶺上"], description: "槓のあとに補充した嶺上牌でツモ和了する1翻役。" },
+  { category: "役", name: "北抜き（抜きドラ）", reading: "きたぬき", aliases: ["抜きドラ", "抜き北"], description: "三麻で北を手牌から公開して外し、補充牌を引くルール。抜いた北1枚につき1翻として数えます。" },
+  { category: "役", name: "国士無双", reading: "コクシムソウ", aliases: ["国士"], description: "一・九・字牌を1枚ずつそろえ、そのうち1種類を対子にする役満。" },
+  { category: "役", name: "四暗刻", reading: "スーアンコウ", aliases: ["スーアンコ"], description: "暗刻を4組そろえる役満。単騎待ちでの和了は倍役満扱いです。" },
+  { category: "役", name: "字一色", reading: "ツーイーソー", aliases: ["ツーイーソウ"], description: "字牌だけで構成する役満。" },
+  { category: "役", name: "九蓮宝燈", reading: "チューレンポウトウ", aliases: ["九蓮"], description: "同じ種類で一・九を各3枚、二から八を各1枚以上そろえる役満。" },
+  { category: "役", name: "純正九蓮宝燈", reading: "ジュンセイチューレンポウトウ", aliases: ["純正九蓮"], description: "九蓮宝燈の13面待ちから和了した形。このアプリでは14枚目を使って判定します。" },
+  { category: "点数", name: "翻", reading: "ハン", aliases: ["翻数"], description: "役の強さを表す単位。役・ドラなどの翻を合計して点数を求めます。" },
+  { category: "点数", name: "符", reading: "フ", aliases: ["符数"], description: "手牌の形や和了方法による加点単位。基本符に各種加符を足して10符単位に切り上げます。" },
+  { category: "点数", name: "ドラ", reading: "ドラ", aliases: ["赤ドラ", "裏ドラ"], description: "成立役ではなく、翻だけを増やす加点要素。役がない場合は和了できません。" },
+  { category: "点数", name: "満貫", reading: "マンガン", aliases: ["満貫"], description: "5翻、または4翻40符以上、3翻70符以上などで到達する上限区分。" },
+  { category: "点数", name: "ロン", reading: "ロン", description: "他家の捨て牌で和了する方法。放銃者1人が点数を支払います。" },
+  { category: "点数", name: "ツモ", reading: "ツモ", aliases: ["自摸"], description: "自分で牌を引いて和了する方法。親・子で支払い方法が変わります。" },
+  { category: "局面", name: "自風", reading: "ジカゼ", aliases: ["自風牌"], description: "自分の席を表す風。刻子／槓子なら役牌になります。" },
+  { category: "局面", name: "場風", reading: "バカゼ", aliases: ["場風牌"], description: "その局の風。刻子／槓子なら役牌になります。" },
+  { category: "局面", name: "親", reading: "オヤ", aliases: ["東家"], description: "東家のこと。和了時は点数が高く、ツモでは他家から同額を受け取ります。" },
+  { category: "局面", name: "本場", reading: "ホンバ", description: "連荘や流局で加算される局数。現在の基本計算画面では別途扱います。" },
+];
