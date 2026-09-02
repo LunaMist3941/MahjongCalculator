@@ -242,18 +242,18 @@ h3 { margin-bottom: 10px; font-size: 0.9rem; color: #597061; }
   .tile-choice b { top: -4px; right: -3px; width: 15px; height: 15px; font-size: 0.55rem; }
   .calculate-button { position: fixed; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); z-index: 40; width: auto; max-width: calc(100vw - 24px); min-height: 46px; padding: 8px 15px; border-radius: 12px; font-size: 0.82rem; }
   .app-footer { display: none; }
-  .result-panel.has-result { position: fixed; top: 8px; right: 8px; bottom: 70px; left: 8px; z-index: 50; display: block; max-height: none; padding: 12px; overflow: hidden; border-radius: 14px; }
+  .result-panel.has-result { position: fixed; top: 8px; right: 8px; bottom: 70px; left: 8px; z-index: 80; display: block; max-height: none; padding: 12px; overflow: hidden; border: 1px solid #cbdacd; border-radius: 14px; background: #fff; box-shadow: 0 16px 36px rgba(28, 57, 38, 0.2); }
   .result-panel:not(.has-result) { display: none; }
   .result-panel.has-result .section-heading { margin-bottom: 7px; }
   .result-panel.has-result .score-hero { padding: 12px; margin: 7px 0 9px; }
-  .result-panel.has-result .score-hero strong { font-size: 1.55rem; }
+  .result-panel.has-result .score-hero strong { font-size: 1.75rem; }
   .result-panel.has-result .score-summary { gap: 5px; margin-bottom: 9px; }
   .result-panel.has-result .score-summary div { padding: 7px 5px; }
-  .result-panel.has-result .score-summary strong { font-size: 1rem; }
-  .result-panel.has-result h3 { margin-bottom: 5px; }
+  .result-panel.has-result .score-summary strong { font-size: 1.1rem; }
+  .result-panel.has-result h3 { margin-bottom: 5px; font-size: 0.98rem; }
   .result-panel.has-result .yaku-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
-  .result-panel.has-result .yaku-list li { padding: 6px 7px; font-size: 0.73rem; }
-  .result-panel.has-result .yaku-list b { font-size: 0.68rem; }
+  .result-panel.has-result .yaku-list li { padding: 7px 8px; font-size: 0.8rem; }
+  .result-panel.has-result .yaku-list b { font-size: 0.75rem; }
   .help-shell { display: block; height: 100svh; min-height: 0; padding: 62px 8px 12px; overflow-x: hidden; overflow-y: auto; }
   .help-shell .app-header { position: fixed; }
   .help-shell .help-search { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 7px; padding: 10px; margin-bottom: 8px; }
