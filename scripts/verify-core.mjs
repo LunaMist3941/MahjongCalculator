@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { calculateHand } from "../core/calculator.ts";
 import { tiles } from "../core/tiles.ts";
+import { DEFAULT_LOCAL_YAKU } from "../core/yaku.ts";
 
 const tileById = new Map(tiles.map((tile) => [tile.id, tile]));
 const context = (overrides = {}) => ({
@@ -38,6 +39,12 @@ const calculateMelded = (ids, melds, overrides = {}) => calculateHand({
   context: context(overrides),
 });
 
+const nagashiDefinition = DEFAULT_LOCAL_YAKU.find((item) => item.id === "nagashi-mangan");
+assert.equal(nagashiDefinition?.category, "通常役");
+assert.equal(nagashiDefinition?.han, 5);
+assert.equal(nagashiDefinition?.limit, undefined);
+assert.equal(nagashiDefinition?.source, undefined);
+
 const pinfu = calculate([
   "man-2", "man-3", "man-4", "man-3", "man-5",
   "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
@@ -70,11 +77,30 @@ const manualLocalDoubleYakuman = calculate([
 assert.deepEqual(manualLocalDoubleYakuman.yaku.map((item) => item.name), ["ローカル2倍役満"]);
 assert.equal(manualLocalDoubleYakuman.score?.limitName, "2倍役満");
 
+const manualNagashiMangan = calculate([
+  "man-2", "man-3", "man-4", "man-3", "man-5",
+  "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
+], "man-4", {}, [{ exclusive: true, id: "nagashi-mangan", name: "流し満貫", han: 5 }]);
+assert.equal(manualNagashiMangan.yaku.some((item) => item.name === "流し満貫"), true);
+assert.deepEqual(manualNagashiMangan.yaku.map((item) => item.name), ["流し満貫"]);
+assert.equal(manualNagashiMangan.han, 5);
+assert.equal(manualNagashiMangan.fu, null);
+assert.equal(manualNagashiMangan.score?.limitName, "満貫");
+
+const manualNagashiManganPriority = calculate([
+  "man-2", "man-3", "man-4", "man-3", "man-5",
+  "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
+], "man-4", { riichi: true, dora: 3 }, [{ exclusive: true, id: "nagashi-mangan", name: "流し満貫", han: 5 }]);
+assert.deepEqual(manualNagashiManganPriority.yaku.map((item) => item.name), ["流し満貫"]);
+assert.equal(manualNagashiManganPriority.han, 5);
+assert.equal(manualNagashiManganPriority.bonusHan, 0);
+assert.equal(manualNagashiManganPriority.score?.limitName, "満貫");
+
 const manualLocalMangan = calculate([
   "man-2", "man-3", "man-4", "man-3", "man-5",
   "pin-2", "pin-3", "pin-4", "sou-6", "sou-7", "sou-8", "pin-5", "pin-5", "man-4",
-], "man-4", { riichi: true, dora: 3 }, [{ id: "local-mangan", name: "流し満貫", han: 0, limit: "mangan" }]);
-assert.deepEqual(manualLocalMangan.yaku.map((item) => item.name), ["流し満貫"]);
+], "man-4", { riichi: true, dora: 3 }, [{ id: "local-mangan", name: "固定満貫ローカル役", han: 0, limit: "mangan" }]);
+assert.deepEqual(manualLocalMangan.yaku.map((item) => item.name), ["固定満貫ローカル役"]);
 assert.equal(manualLocalMangan.score?.limitName, "満貫");
 assert.equal(manualLocalMangan.bonusHan, 0);
 

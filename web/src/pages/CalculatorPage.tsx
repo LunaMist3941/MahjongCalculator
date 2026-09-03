@@ -237,7 +237,7 @@ function CalculatorPage({ localYaku, onOpenHelp, onOpenYaku }: CalculatorPagePro
         )}
         {applicableLocalYaku.length > 0 && (
           <fieldset className="local-yaku-fields">
-            <legend>ローカル役（手動追加）</legend>
+            <legend>ローカル役（手動選択）</legend>
             {applicableLocalYaku.map((yaku) => (
               <label className="check-field" key={yaku.id}>
                 <input

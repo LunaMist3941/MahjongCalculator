@@ -43,7 +43,7 @@ function App() {
       const defaultsById = new Map(DEFAULT_LOCAL_YAKU.map((yaku) => [yaku.id, yaku]));
       const savedWithMigratedDefaults = saved.map((yaku) => {
         const defaultYaku = defaultsById.get(yaku.id);
-        return defaultYaku ? { ...defaultYaku, ...yaku, source: defaultYaku.source, builtIn: true } : yaku;
+        return defaultYaku ? { ...defaultYaku } : yaku;
       });
       const missingDefaults = DEFAULT_LOCAL_YAKU.filter((defaultYaku) => !savedWithMigratedDefaults.some((yaku) => yaku.id === defaultYaku.id));
       return [...missingDefaults, ...savedWithMigratedDefaults];

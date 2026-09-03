@@ -299,9 +299,9 @@ function isScoreLimit(value: unknown): value is ScoreLimit {
 }
 
 function keepHighestLimitOnly(yaku: YakuResult[]): YakuResult[] {
-  const exclusiveYakuman = yaku.find((item) => item.yakuman && item.exclusive);
-  if (exclusiveYakuman) {
-    return [exclusiveYakuman];
+  const exclusiveYaku = yaku.find((item) => item.exclusive);
+  if (exclusiveYaku) {
+    return [exclusiveYaku];
   }
   const yakuman = yaku.filter((item) => item.yakuman);
   if (yakuman.length > 0) {
@@ -352,7 +352,7 @@ function normalizeManualYaku(localYaku: ManualYakuInput[]): { yaku: YakuResult[]
       errors.push(`手動役「${item.name}」の翻数は1〜13翻で指定してください。`);
       continue;
     }
-    yaku.push({ id: item.id, name: item.name.trim(), han: item.han });
+    yaku.push({ id: item.id, name: item.name.trim(), han: item.han, ...(item.exclusive ? { exclusive: true } : {}) });
   }
 
   return { yaku, errors };
@@ -744,15 +744,16 @@ function evaluateCandidate(
     ...evaluateYaku(candidate, counts, context, winningIndex),
     ...localYaku,
   ]);
+  const hasExclusiveYaku = yaku.some((item) => item.exclusive);
   const hasYakuman = yaku.some((item) => item.yakuman);
   const fixedLimit = yaku.find((item) => item.limit !== undefined)?.limit;
-  const bonusHan = hasYakuman || fixedLimit ? 0 :
+  const bonusHan = hasYakuman || fixedLimit || hasExclusiveYaku ? 0 :
     Math.max(0, context.dora) + Math.max(0, context.uraDora) + Math.max(0, context.akaDora) +
     (getRuleConfig(context.rule).supportsKitaNuki ? Math.max(0, context.kitaNuki) : 0);
   const yakuHan = yaku.reduce((sum, item) => sum + item.han, 0);
   const han = yakuHan + bonusHan;
   const yakuman = yaku.reduce((sum, item) => sum + (item.yakuman ?? 0), 0);
-  const fu = hasYakuman || fixedLimit ? null : calculateFu(candidate, yaku, context, winningIndex);
+  const fu = hasYakuman || fixedLimit || hasExclusiveYaku ? null : calculateFu(candidate, yaku, context, winningIndex);
   const score = hasYakuman || fixedLimit || han > 0
     ? calculateScore(han, fu, yakuman, context, fixedLimit)
     : null;

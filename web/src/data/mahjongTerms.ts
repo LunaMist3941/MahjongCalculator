@@ -57,5 +57,5 @@ export const mahjongTerms: MahjongTerm[] = [
   { category: "局面", name: "場風", reading: "バカゼ", aliases: ["場風牌"], description: "その局の風。刻子／槓子なら役牌になります。" },
   { category: "局面", name: "親", reading: "オヤ", aliases: ["東家"], description: "東家のこと。和了時は点数が高く、ツモでは他家から同額を受け取ります。" },
   { category: "局面", name: "本場", reading: "ホンバ", description: "連荘や流局で加算される局数。現在の基本計算画面では別途扱います。" },
-  { category: "局面", name: "流し満貫", reading: "ナガシマンガン", aliases: ["流し満貫"], description: "捨て牌と流局状況に関するローカルルール。採用条件を手動確認して満貫として扱います。" },
+  { category: "局面", name: "流し満貫", reading: "ナガシマンガン", aliases: ["流し満貫"], description: "捨て牌と流局状況に関するローカルルール。採用条件を手動確認したうえで、計算条件から通常役の5翻として選択します。選択時は流し満貫を優先し、他の役とドラを加算しません。" },
 ];

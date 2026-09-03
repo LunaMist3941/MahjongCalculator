@@ -35,14 +35,13 @@ export interface LocalYakuDefinition {
 export const DEFAULT_LOCAL_YAKU: readonly LocalYakuDefinition[] = [
   {
     builtIn: true,
-    category: "満貫",
-    condition: "捨て牌がすべて么九牌（1・9・字牌）で、捨て牌が鳴かれず、他家の和了がないまま流局するなど、採用ルールの条件を満たす。",
-    han: 0,
+    category: "通常役",
+    condition: "捨て牌がすべて么九牌（1・9・字牌）で、捨て牌が鳴かれず、他家の和了がないまま流局するなど、採用ルールの条件を満たす。成立確認後、通常役の5翻として手動選択する。",
+    exclusive: true,
+    han: 5,
     id: "nagashi-mangan",
-    limit: "mangan",
     name: "流し満貫",
     rules: [RuleMode.JANTAMA_4, RuleMode.JANTAMA_3, RuleMode.STANDARD_4, RuleMode.STANDARD_3],
-    source: "initial",
   },
   {
     builtIn: true,

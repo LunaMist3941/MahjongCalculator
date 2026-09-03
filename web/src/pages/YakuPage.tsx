@@ -65,6 +65,13 @@ function localValueLabel(yaku: LocalYakuDefinition): string {
   return `${yaku.han}翻（手動）`;
 }
 
+function localSourceLabel(yaku: LocalYakuDefinition): string {
+  if (yaku.source === "standard-local" || yaku.builtIn) {
+    return "標準ローカル";
+  }
+  return "ローカル役";
+}
+
 function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: YakuPageProps) {
   const [rule, setRule] = useState<RuleMode>(RuleMode.JANTAMA_4);
   const [category, setCategory] = useState("すべて");
@@ -179,7 +186,7 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
             <article className={`yaku-catalog-card is-local ${yaku.yakuman ? "is-yakuman" : ""} ${yaku.limit ? "is-limit" : ""}`} key={yaku.id}>
               <div className="yaku-card-heading">
                 <h3>{yaku.name}</h3>
-                <span>{yaku.source === "initial" ? "初期役" : yaku.source === "standard-local" ? "標準ローカル" : yaku.builtIn ? "標準ローカル" : "ローカル役"}</span>
+                <span>{yaku.category}・{localSourceLabel(yaku)}</span>
               </div>
               <p className="yaku-value">{localValueLabel(yaku)}</p>
               <p className="yaku-condition"><strong>成立条件：</strong>{yaku.condition}</p>
@@ -205,7 +212,7 @@ function YakuPage({ localYaku, onAddLocalYaku, onBack, onRemoveLocalYaku }: Yaku
           </div>
           <span className="counter">対象：{rule === RuleMode.JANTAMA_3 || rule === RuleMode.STANDARD_3 ? "三麻" : "四麻"}</span>
         </div>
-        <p className="local-yaku-help">登録した役は選択中のルールだけに保存され、計算画面の「計算条件」で成立したものを選択できます。</p>
+        <p className="local-yaku-help">登録した役は選択中のルールだけに保存され、計算画面の「計算条件」で成立したものを選択できます。流し満貫も同じ選択式です。</p>
         <div className="local-yaku-form">
           <label className="field">
             <span>役名</span>
